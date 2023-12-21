@@ -21,7 +21,7 @@ export default class User extends BaseModel {
   @column.dateTime({
     autoCreate: true,
     serialize: (value) => {
-      return value.toFormate('dd/MM/yyyy HH:mm:ss')
+      return value.toFormat('dd/MM/yyyy HH:mm:ss')
     },
   })
   public createdAt: DateTime
@@ -30,7 +30,7 @@ export default class User extends BaseModel {
     autoCreate: true,
     autoUpdate: true,
     serialize: (value) => {
-      return value.toFormate('dd/MM/yyyy HH:mm:ss')
+      return value.toFormat('dd/MM/yyyy HH:mm:ss')
     },
   })
   public updatedAt: DateTime

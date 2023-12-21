@@ -50,24 +50,27 @@ export default class UsersController {
     }
   }
 
-  public async update({ params, request, response }: HttpContextContract) {
+  public async update({ params, request, response, auth }: HttpContextContract) {
     try {
+      const user = await auth.authenticate()
+
       const body = request.body()
 
-      const user = await User.findOrFail(params.id)
+      const userUptade = await User.query().where('id', user.id).where(params).firstOrFail()
+      // const user = await User.findOrFail(params.id)
 
-      user.name = body.name
-      user.email = body.email
+      userUptade.name = body.name
+      userUptade.email = body.email
 
       if (body.password) {
-        user.password = await Hash.make(body.password)
+        userUptade.password = await Hash.make(body.password)
       }
 
-      await user.save()
+      await userUptade.save()
 
       return response.status(200).json({
         message: 'Usuário atualizado com sucesso!',
-        data: user,
+        data: userUptade,
       })
     } catch (error) {
       return response.status(400).json({
@@ -77,15 +80,17 @@ export default class UsersController {
     }
   }
 
-  public async destroy({ params, response }: HttpContextContract) {
+  public async destroy({ params, response, auth }: HttpContextContract) {
     try {
-      const user = await User.findOrFail(params.id)
+      const user = await auth.authenticate()
 
-      await user.delete()
+      const userUptade = await User.query().where('id', user.id).where(params).firstOrFail()
+
+      await userUptade.delete()
 
       return response.status(200).json({
         message: 'Usuário excluído com sucesso!',
-        data: user,
+        data: userUptade,
       })
     } catch (error) {
       return response.status(400).json({

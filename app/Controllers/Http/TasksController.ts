@@ -24,7 +24,11 @@ export default class TasksController {
       const user = await auth.authenticate()
       const body = await request.validate(TaskValidator)
 
-      const task = await user.related('task').create(body)
+      const task = await user.related('task').create({
+        title: body.title,
+        description: body.description,
+        status: body.status as 'pendente' | 'em_andamento' | 'concluida' | undefined,
+      })
 
       return response.status(200).json({
         message: 'Tarefa criada com sucesso!',
@@ -54,14 +58,17 @@ export default class TasksController {
     }
   }
 
-  public async update({ response, request, params }: HttpContextContract) {
+  public async update({ response, request, params, auth }: HttpContextContract) {
     try {
-      const body = await request.validate(TaskValidator)
+      const user = await auth.authenticate()
 
-      const task = await Task.findOrFail(params.id)
+      const body = await request.body()
 
+      // const task = await Task.findOrFail(params.id)
+      const task = await Task.query().where('user_id', user.id).where(params).firstOrFail()
       task.title = body.title
       task.description = body.description
+      task.status = body.status
 
       await task.save()
 
@@ -77,10 +84,14 @@ export default class TasksController {
     }
   }
 
-  public async destroy({ response, params }: HttpContextContract) {
+  public async destroy({ response, params, auth }: HttpContextContract) {
     try {
-      const task = await Task.findOrFail(params.id)
+      const user = await auth.authenticate()
+
+      const task = await Task.query().where('user_id', user.id).where(params).firstOrFail()
+
       await task.delete()
+
       return response.status(200).json({
         message: 'Tarefa excluída com sucesso!',
         data: task,

@@ -22,7 +22,7 @@ import Route from '@ioc:Adonis/Core/Route'
 
 // Rotas de autenticação
 
-Route.post('/register', 'UserController.store') //Registrar um novo usuário.
+Route.post('/register', 'UsersController.store') //Registrar um novo usuário.
 Route.post('/login', 'AuthController.store') //Autenticar um usuário.
 Route.delete('/login', 'AuthController.destroy').middleware('auth') //Desautenticar um usuário
 
